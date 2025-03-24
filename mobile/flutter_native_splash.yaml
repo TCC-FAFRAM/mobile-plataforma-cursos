@@ -1,0 +1,7 @@
+flutter_native_splash:
+  color: "#B3DA31" # Cor de fundo da splash screen
+  image: assets/images/Logo.png # Caminho da logo (altere conforme necessário)
+  android_12:
+    color: "#B3DA31"
+    image: assets/images/Logo.png
+  fullscreen: true

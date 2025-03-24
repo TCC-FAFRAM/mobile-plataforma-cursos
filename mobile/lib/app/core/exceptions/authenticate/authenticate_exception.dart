@@ -1,0 +1,1 @@
+class AuthenticateException implements Exception {}
