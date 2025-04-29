@@ -1,17 +1,19 @@
 import 'base_dto.dart';
 
 class PaginationDTO<T> implements BaseDTO {
-  final T? codigo;
+  final T? data;
   final int take;
-  final int skip;
+  final int pagina;
   final String? search;
   final String? orderBy;
 
   PaginationDTO({
-    this.codigo,
-    required this.take,
-    required this.skip,
+    this.data,
+    this.take = 10,
+    required this.pagina,
     this.search,
     this.orderBy,
   });
+
+  int get skip => pagina * take;
 }

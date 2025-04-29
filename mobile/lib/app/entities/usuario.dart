@@ -5,7 +5,7 @@ final class Usuario {
   final String nome;
   final String email;
   final String? tipo;
-  final String sobreNome;
+  final String? sobreNome;
   final String? senha;
 
   Usuario({
@@ -13,7 +13,7 @@ final class Usuario {
     required this.nome,
     required this.email,
     this.tipo,
-    required this.sobreNome,
+    this.sobreNome,
     required this.senha,
   });
 
@@ -34,7 +34,7 @@ final class Usuario {
       nome: map['nome'] as String,
       email: map['email'] as String,
       tipo: map['tipo'] != null ? map['tipo'] as String : null,
-      sobreNome: map['sobre_nome'] as String,
+      sobreNome: map['sobre_nome'] != null ? map['sobre_nome'] as String : null,
       senha: map['senha'] != null ? map['senha'] as String : null,
     );
   }

@@ -21,8 +21,8 @@ class _LoginPageState extends AppBaseState<LoginPage, LoginController> {
   final _passwordController = TextEditingController();
 
   void _login() {
-    //controller.login(_emailController.text, _passwordController.text);
-    Navigator.popAndPushNamed(context, AppRouters.home);
+    controller.login(_emailController.text, _passwordController.text);
+    // Navigator.popAndPushNamed(context, AppRouters.home);
   }
 
   @override

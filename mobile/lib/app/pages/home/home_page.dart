@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app/app/core/ui/helpers/app_size_extensions.dart';
 import 'package:app/app/core/ui/styles/app_colors.dart';
 import 'package:app/app/core/utils/app_routers.dart';
 import 'package:app/app/pages/home/home_controller.dart';
@@ -6,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/ui/base_state/app_base_state.dart';
 import 'home_state.dart';
+import 'widgets/card_curso.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends AppBaseState<HomePage, HomeController> {
+  final ScrollController _scrollController = ScrollController();
   final List<Map<String, String>> items = [
     {
       'image':
@@ -26,7 +31,19 @@ class _HomePageState extends AppBaseState<HomePage, HomeController> {
   @override
   void onReady() async {
     super.onReady();
-    await controller.initApp();
+    controller.initApp();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() async {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {}
   }
 
   @override
@@ -105,51 +122,47 @@ class _HomePageState extends AppBaseState<HomePage, HomeController> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+                  onChanged: (value) async {
+                    controller.pesquisar = value;
+                    Timer(const Duration(seconds: 2), () async {
+                      await controller.getCursos(true);
+                    });
+                  },
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRouters.cursoDetalhe);
-                        },
-                        child: Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(10)),
-                                child: Image.network(
-                                  item['image']!,
-                                  height: 200,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  item['description']!,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.appColors.primary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                BlocConsumer<HomeController, HomeState>(
+                  listener: (context, state) {
+                    state.status.matchAny(
+                      any: () {
+                        hideLoader();
+                      },
+                      loading: () {
+                        showLoader(null);
+                      },
+                      error: () {
+                        hideLoader();
+                        showError(state.message ?? 'Erro não informado');
+                      },
+                    );
+                  },
+                  buildWhen: (previous, current) => current.status.matchAny(
+                    any: () => false,
+                    initial: () => true,
+                    loaded: () => true,
                   ),
+                  builder: (context, state) {
+                    return Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(5),
+                        controller: _scrollController,
+                        itemCount: state.items.length,
+                        itemBuilder: (context, index) {
+                          return CardCurso(
+                            item: state.items[index],
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
